@@ -13,3 +13,8 @@ class UpdatePetEvent extends PetEvent {
   Pet? pet;
   UpdatePetEvent({this.pet});
 }
+
+class DeletePetEvent extends PetEvent {
+  int? id;
+  DeletePetEvent({this.id});
+}

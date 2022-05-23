@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bloc/bloc.dart';
 import 'package:openapi/api.dart';
 
@@ -17,6 +15,9 @@ class PetBloc extends Bloc<PetEvent, PetState> {
       }
       if (event is UpdatePetEvent) {
         await _updatePet(event, emit);
+      }
+      if (event is DeletePetEvent) {
+        await _deletePet(event, emit);
       }
     });
   }
@@ -37,7 +38,6 @@ class PetBloc extends Bloc<PetEvent, PetState> {
       soldPets = (await petApi.findPetsByStatus(['sold'])).toList();
       emit(PetsByStatusSuccessState());
     } catch (e) {
-      log(e.toString());
       emit(PetsByStatusErrorState());
     }
   }
@@ -48,7 +48,6 @@ class PetBloc extends Bloc<PetEvent, PetState> {
       await petApi.addPet(event.pet);
       emit(AddPetSuccessState());
     } catch (e) {
-      log(e.toString());
       emit(AddPetErrorState());
     }
   }
@@ -59,8 +58,17 @@ class PetBloc extends Bloc<PetEvent, PetState> {
       await petApi.updatePet(event.pet);
       emit(AddPetSuccessState());
     } catch (e) {
-      log(e.toString());
       emit(AddPetErrorState());
+    }
+  }
+
+  _deletePet(DeletePetEvent event, Emitter<PetState> emit) async {
+    try {
+      emit(DeletePetLoadingState());
+      await petApi.deletePet(event.id);
+      emit(DeletePetSuccessState());
+    } catch (e) {
+      emit(DeletePetErrorState());
     }
   }
 }

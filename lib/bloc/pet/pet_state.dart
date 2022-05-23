@@ -21,3 +21,9 @@ class UpdatePetSuccessState extends PetState {}
 class UpdatePetLoadingState extends PetState {}
 
 class UpdatePetErrorState extends PetState {}
+
+class DeletePetSuccessState extends PetState {}
+
+class DeletePetLoadingState extends PetState {}
+
+class DeletePetErrorState extends PetState {}

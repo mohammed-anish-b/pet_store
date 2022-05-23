@@ -76,6 +76,7 @@ class _HomePageState extends State<HomePage> {
   ListView _buildPetsListView(List<Pet> pets) {
     return ListView.builder(
       itemBuilder: (context, index) {
+        final pet = pets[index];
         return Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
           child: Card(
@@ -83,15 +84,13 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 children: [
-                  Expanded(child: Text('${pets[index].name}')),
+                  Expanded(child: Text(pet.name ?? '')),
                   IconButton(
                     onPressed: () {
                       showDialog(
                         context: context,
                         builder: (context) {
-                          return AddPetDialog(
-                            pet: pets[index],
-                          );
+                          return AddPetDialog(pet: pet);
                         },
                       );
                     },
@@ -102,7 +101,41 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text('Are you sure?'),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.maybePop(context);
+                                          BlocProvider.of<PetBloc>(context)
+                                              .add(DeletePetEvent(id: pet.id));
+                                          BlocProvider.of<PetBloc>(context)
+                                              .add(GetPetsByStatusEvent());
+                                        },
+                                        child: const Text('Yes')),
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.maybePop(context);
+                                        },
+                                        child: const Text('No'))
+                                  ],
+                                )
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
                     padding: const EdgeInsets.all(8),
                     icon: const Icon(
                       Icons.delete,
