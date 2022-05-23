@@ -142,6 +142,55 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.red,
                     ),
                   ),
+                  if (pet.status != PetStatusEnum.sold)
+                    TextButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Text('Are you sure?'),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.maybePop(context);
+                                              if (pet.status ==
+                                                  PetStatusEnum.available) {
+                                                pet.status =
+                                                    PetStatusEnum.pending;
+                                              } else if (pet.status ==
+                                                  PetStatusEnum.pending) {
+                                                pet.status = PetStatusEnum.sold;
+                                              }
+                                              BlocProvider.of<PetBloc>(context)
+                                                  .add(
+                                                      UpdatePetEvent(pet: pet));
+                                              BlocProvider.of<PetBloc>(context)
+                                                  .add(GetPetsByStatusEvent());
+                                            },
+                                            child: const Text('Yes')),
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.maybePop(context);
+                                            },
+                                            child: const Text('No'))
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        child: Text(pet.status == PetStatusEnum.available
+                            ? 'ORDER NOW'
+                            : 'MARK AS SOLD'))
                 ],
               ),
             ),
@@ -163,16 +212,13 @@ class AddPetDialog extends StatefulWidget {
 
 class _AddPetDialogState extends State<AddPetDialog> {
   TextEditingController? nameTextController;
-  PetStatusEnum? status;
 
   @override
   void initState() {
     nameTextController = widget.pet == null
         ? TextEditingController()
         : TextEditingController(text: widget.pet?.name);
-    if (widget.pet != null) {
-      status = widget.pet?.status;
-    }
+
     super.initState();
   }
 
@@ -189,35 +235,13 @@ class _AddPetDialogState extends State<AddPetDialog> {
               alignLabelWithHint: true,
             ),
           ),
-          DropdownButton<PetStatusEnum>(
-              onChanged: (value) {
-                setState(() {
-                  status = value;
-                });
-              },
-              value: status,
-              isExpanded: true,
-              underline: Container(),
-              hint: const Text('Status'),
-              items: [
-                PetStatusEnum.available,
-                PetStatusEnum.pending,
-                PetStatusEnum.sold,
-              ]
-                  .map((e) => DropdownMenuItem(
-                        child: Text(e.toString()),
-                        value: e,
-                      ))
-                  .toList()),
           TextButton(
               onPressed: () {
                 if (widget.pet == null) {
                   Pet pet = Pet(name: nameTextController?.text);
-                  pet.status = status;
                   BlocProvider.of<PetBloc>(context).add(AddPetEvent(pet: pet));
                 } else {
                   widget.pet?.name = nameTextController?.text;
-                  widget.pet?.status = status;
                   BlocProvider.of<PetBloc>(context)
                       .add(UpdatePetEvent(pet: widget.pet));
                 }
