@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:bloc/bloc.dart';
-import 'package:http/http.dart';
 import 'package:openapi/api.dart';
 
 part 'pet_event.dart';
@@ -22,9 +19,6 @@ class PetBloc extends Bloc<PetEvent, PetState> {
       if (event is DeletePetEvent) {
         await _deletePet(event, emit);
       }
-      if (event is UploadPetImage) {
-        await _uploadPetImage(event, emit);
-      }
     });
   }
 
@@ -41,7 +35,7 @@ class PetBloc extends Bloc<PetEvent, PetState> {
           (await petApi.findPetsByStatus(['available'])).reversed.toList();
       pendingPets =
           (await petApi.findPetsByStatus(['pending'])).reversed.toList();
-      soldPets = (await petApi.findPetsByStatus(['sold'])).toList();
+      soldPets = (await petApi.findPetsByStatus(['sold'])).reversed.toList();
       emit(PetsByStatusSuccessState());
     } catch (e) {
       emit(PetsByStatusErrorState());
@@ -75,17 +69,6 @@ class PetBloc extends Bloc<PetEvent, PetState> {
       emit(DeletePetSuccessState());
     } catch (e) {
       emit(DeletePetErrorState());
-    }
-  }
-
-  _uploadPetImage(UploadPetImage event, Emitter<PetState> emit) async {
-    try {
-      emit(UploadPetImageLoadingState());
-      await petApi.uploadFile(event.id,
-          file: await MultipartFile.fromPath('file', event.file?.path ?? ''));
-      emit(UploadPetImageSuccessState());
-    } catch (e) {
-      emit(UploadPetImageErrorState());
     }
   }
 }

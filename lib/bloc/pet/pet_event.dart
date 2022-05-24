@@ -18,9 +18,3 @@ class DeletePetEvent extends PetEvent {
   int? id;
   DeletePetEvent({this.id});
 }
-
-class UploadPetImage extends PetEvent {
-  int? id;
-  File? file;
-  UploadPetImage({this.id, this.file});
-}

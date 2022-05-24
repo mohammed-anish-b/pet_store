@@ -27,9 +27,3 @@ class DeletePetSuccessState extends PetState {}
 class DeletePetLoadingState extends PetState {}
 
 class DeletePetErrorState extends PetState {}
-
-class UploadPetImageSuccessState extends PetState {}
-
-class UploadPetImageLoadingState extends PetState {}
-
-class UploadPetImageErrorState extends PetState {}
